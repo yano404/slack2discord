@@ -6,6 +6,8 @@ from html import unescape
 from pathlib import Path
 from typing import List, Union
 
+from tqdm import tqdm
+
 from . import model, util
 
 
@@ -35,23 +37,23 @@ class SlackData:
     def parse_messages_in_channel(self, channelid: str):
         ch = self.channels.get_channel_by_id(channelid)
 
-        print(f"Parsing {ch.name}")
+        print(f"Processing #{ch.name}")
 
         chpath = self.datadir.joinpath(ch.name)
         jsonpaths = sorted(
             [
                 p
                 for p in chpath.glob("*.json")
-                if re.search("\d{4}-\d{2}-\d{2}.json", str(p))
+                if re.search(r"\d{4}-\d{2}-\d{2}.json", str(p))
             ]
         )
-
+        bar = tqdm(total=len(jsonpaths))
         for jsonpath in jsonpaths:
-            print(jsonpath.name)
             with open(jsonpath) as f:
                 rawmsgs = json.load(f)
                 for rawmsg in rawmsgs:
                     ch.add_message(self.parse_message(rawmsg))
+            bar.update(1)
 
     def parse_message(self, rawmsg: dict) -> model.Message:
         type: str = ""
@@ -82,7 +84,6 @@ class SlackData:
         text = self.fill_references(text)
         text = unescape(text)
         text = util.replace(text)
-        print(text)
 
         if "files" in rawmsg:
             for fileinfo in rawmsg["files"]:
