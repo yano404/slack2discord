@@ -85,12 +85,13 @@ class MsgAttachment:
 
     def to_text(self) -> str:
         text = self.text
-        if not self.url:
+        if self.url:
             text = f"{self.url}\n{text}"
-        if not self.title:
+        if self.title:
             text = f"**{self.title}**\n{text}"
-        text = re.sub(r"^", r">", text)
-        text = re.sub(r"\n", r"\n>", text)
+        if self.text:
+            text = re.sub(r"^", r">", text)
+            text = re.sub(r"\n", r"\n>", text)
         return text
 
 
@@ -130,16 +131,16 @@ class Message:
             text += "\n" + attachment.to_text()
         return text
 
-    def get_discord_files(self):
+    def get_discord_files(self) -> List[discord.File]:
         discord_files: List[discord.File] = []
         for file in self.files:
             discord_files.append(file.to_discord_file())
+        return discord_files
 
 
 class Messages:
     def __init__(self) -> None:
         self.messagelist: List[Message] = []
-        self._i = 0
 
     def __iter__(self):
         i = 0
@@ -177,9 +178,7 @@ class Messages:
 
 
 class Channel:
-    def __init__(
-        self, channelinfo: dict, users: Users, messages: Messages = Messages()
-    ) -> None:
+    def __init__(self, channelinfo: dict, users: Users) -> None:
         self.id = channelinfo["id"]
         self.name = channelinfo["name"]
         self.topic = channelinfo["topic"]["value"]
@@ -187,7 +186,7 @@ class Channel:
         self.members: List[User] = []
         for userid in channelinfo["members"]:
             self.members.append(users.get_user_by_id(userid))
-        self.messages: Messages = messages
+        self.messages: Messages = Messages()
 
     def add_message(self, message: Message):
         self.messages.add_message(message)
@@ -207,7 +206,7 @@ class Channels:
             yield self.channellist[i]
             i += 1
 
-    def get_channel_by_id(self, id) -> Channel:
+    def get_channel_by_id(self, id: str) -> Channel:
         for channel in self.channellist:
             if channel.id == id:
                 return channel
