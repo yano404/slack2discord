@@ -1,5 +1,11 @@
-# ignore vim temporary files
+# Ignore vim temporary files
 *~
+
+# Ignore data
+data/exported_json/*
+!data/exported_json/.gitkeep
+data/files/*
+!data/files/.gitkeep
 
 ## macOSX
 .DS_Store
