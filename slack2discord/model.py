@@ -90,8 +90,8 @@ class MsgAttachment:
         if self.title:
             text = f"**{self.title}**\n{text}"
         if self.text:
-            text = re.sub(r"^", r">", text)
-            text = re.sub(r"\n", r"\n>", text)
+            text = re.sub(r"^", r"> ", text)
+            text = re.sub(r"\n", r"\n> ", text)
         return text
 
 
