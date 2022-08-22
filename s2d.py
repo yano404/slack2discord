@@ -1,5 +1,6 @@
 import os
 import pathlib
+import sys
 import time
 from typing import Union
 
@@ -53,7 +54,18 @@ async def send_message(
         ]
         for i, text in enumerate(msg_text):
             if i == 0 and discord_files:
-                discord_msg = await discord_channel.send(text, files=discord_files)
+                try:
+                    discord_msg = await discord_channel.send(text, files=discord_files)
+                except discord.errors.HTTPException as e:
+                    if e.status == 413:
+                        text += (
+                            "\n*The file could not be uploaded "
+                            + "because the file is too large*"
+                        )
+                        discord_msg = await discord_channel.send(text)
+                    else:
+                        print(e)
+                        sys.exit(1)
             else:
                 discord_msg = await discord_channel.send(text)
         time.sleep(THROTTLE_TIME)
@@ -62,7 +74,19 @@ async def send_message(
             for reply in slack_channel.messages.find_replies_by_message(message):
                 reply_files = reply.get_discord_files()
                 if reply_files:
-                    await discord_thread.send(reply.to_text(), files=reply_files)
+                    try:
+                        await discord_thread.send(reply.to_text(), files=reply_files)
+                    except discord.errors.HTTPException as e:
+                        if e.status == 413:
+                            text = (
+                                reply.to_text()
+                                + "\n*The file could not be uploaded "
+                                + "because the file is too large*"
+                            )
+                            await discord_thread.send(text)
+                        else:
+                            print(e)
+                            sys.exit(1)
                 else:
                     await discord_thread.send(reply.to_text())
                 time.sleep(THROTTLE_TIME)
