@@ -12,12 +12,13 @@ def ts2date(ts: str, fmt: str = "%y/%m/%d %H:%M:%S") -> str:
         return ""
 
 
-REGEX_SUB_STRS = {r"\\": r"/"}
+REGEX_SUB_STRS = {r"\\/": r"/", r"<!channel>": r"@channel", r"<!here>": r"@here"}
 
 
 def replace(text: str):
     for regex, repl in REGEX_SUB_STRS.items():
-        return re.sub(regex, repl, text)
+        text = re.sub(regex, repl, text)
+    return text
 
 
 def url_unescape(url: str):
