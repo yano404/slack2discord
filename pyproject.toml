@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "slack2discord"
+version = "0.1.0"
+description = "Tool to migrate from slack to discord"
+authors = ["Takayuki Yano <12232024+yano404@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+py-cord = "^2.0.1"
+requests = "^2.28.1"
+python-dotenv = "^0.20.0"
+tqdm = "^4.64.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
