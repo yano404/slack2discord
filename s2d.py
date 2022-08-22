@@ -11,14 +11,15 @@ import slack2discord
 load_dotenv()
 
 THROTTLE_TIME = 0.5  # sec
+MAX_TEXT_LENGTH = 2000
 
 bot = discord.Bot()
 
 datadir = pathlib.Path(os.getenv("EXPORTED_DATA_DIR"))
 filesdir = pathlib.Path(os.getenv("FILES_DIR"))
 
-print(f"EXPORTED_DATA_DIR: {datadir.name}")
-print(f"FILES_DIR: {filesdir.name}")
+print(f"EXPORTED_DATA_DIR: {datadir}")
+print(f"FILES_DIR: {filesdir}")
 
 slackdata = slack2discord.SlackData(datadir, filesdir)
 
@@ -45,12 +46,16 @@ async def send_message(
         pass
     else:
         discord_files = message.get_discord_files()
-        if discord_files:
-            discord_msg = await discord_channel.send(
-                message.to_text(), files=discord_files
-            )
-        else:
-            discord_msg = await discord_channel.send(message.to_text())
+        msg_text = message.to_text()
+        msg_text = [
+            msg_text[i : i + MAX_TEXT_LENGTH]
+            for i in range(0, len(msg_text), MAX_TEXT_LENGTH)
+        ]
+        for i, text in enumerate(msg_text):
+            if i == 0 and discord_files:
+                discord_msg = await discord_channel.send(text, files=discord_files)
+            else:
+                discord_msg = await discord_channel.send(text)
         time.sleep(THROTTLE_TIME)
         if message.has_thread:
             discord_thread = await discord_msg.create_thread(name="Replies")
