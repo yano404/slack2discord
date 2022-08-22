@@ -73,10 +73,10 @@ class SlackData:
 
         if "user" in rawmsg:
             user_id = rawmsg["user"]
-        elif "bot_id" in rawmsg:
+            user_name = self.users.get_display_name_by_id(user_id)
+        if "bot_id" in rawmsg:
             user_id = rawmsg["bot_id"]
-
-        user_name = self.users.get_display_name_by_id(user_id)
+            user_name = rawmsg["username"] if "username" in rawmsg else f"Bot {user_id}"
 
         ts = rawmsg["ts"]
 
@@ -112,7 +112,7 @@ class SlackData:
                     attachmentinfo["title"] if "title" in attachmentinfo else ""
                 )
                 attachment_text: str = util.modify_googlecal_date(
-                    attachmentinfo["text"] if "texte" in attachmentinfo else ""
+                    attachmentinfo["text"] if "text" in attachmentinfo else ""
                 )
                 attachment_text = self.fill_references(attachment_text)
                 attachment_text = unescape(attachment_text)
