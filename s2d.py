@@ -1,5 +1,6 @@
 import os
 import pathlib
+import time
 from typing import Union
 
 import discord
@@ -8,6 +9,8 @@ from dotenv import load_dotenv
 import slack2discord
 
 load_dotenv()
+
+THROTTLE_TIME = 0.5  # sec
 
 bot = discord.Bot()
 
@@ -48,6 +51,7 @@ async def send_message(
             )
         else:
             discord_msg = await discord_channel.send(message.to_text())
+        time.sleep(THROTTLE_TIME)
         if message.has_thread:
             discord_thread = await discord_msg.create_thread(name="Replies")
             for reply in slack_channel.messages.find_replies_by_message(message):
@@ -56,6 +60,7 @@ async def send_message(
                     await discord_thread.send(reply.to_text(), files=reply_files)
                 else:
                     await discord_thread.send(reply.to_text())
+                time.sleep(THROTTLE_TIME)
 
 
 class S2D(discord.ui.View):
