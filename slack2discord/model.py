@@ -184,8 +184,9 @@ class Channel:
         self.topic = channelinfo["topic"]["value"]
         self.purpose = channelinfo["purpose"]["value"]
         self.members: List[User] = []
-        for userid in channelinfo["members"]:
-            self.members.append(users.get_user_by_id(userid))
+        if "members" in channelinfo:
+            for userid in channelinfo["members"]:
+                self.members.append(users.get_user_by_id(userid))
         self.messages: Messages = Messages()
 
     def add_message(self, message: Message):
