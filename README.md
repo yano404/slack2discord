@@ -38,8 +38,8 @@ See https://slack.com/help/articles/201658943-Export-your-workspace-data .
 3. Edit `.env` .
    ```
    EXPORTED_DATA_DIR = "data/exported_json/<your slack workspace data>"
-    FILES_DIR = "data/files"
-    TOKEN = "YOUR DISCORD BOT TOKEN"
+   FILES_DIR = "data/files"
+   TOKEN = "YOUR DISCORD BOT TOKEN"
    ```
 4. Run `s2d.py`.
    ```
